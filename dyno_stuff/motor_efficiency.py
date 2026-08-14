@@ -23,7 +23,9 @@ This is a cleaned-up, runnable version of the "Fix 1" workflow from the
         mechanical output power vs. electrical input power, and hence efficiency.
     6.  Plot efficiency as an interactive 3-D scatter and as a fitted surface.
 
-Run `python motor_efficiency.py --help` for options.
+To run the analysis you will need to edit the `DYNO_MATCHED` and `MOTEC_MATCHED`
+lists to match the files you have, and optionally change the `FOLDER` and `DATE`
+paths to point to your data.
 """
 
 from __future__ import annotations
@@ -48,8 +50,12 @@ import plotly.graph_objects as go
 # --------------------------------------------------------------------------- #
 
 # Where the raw CSVs live. Change these to match your folder layout.
-DYNO_DATA_DIR = Path("Dyno_Data")
-MOTEC_DATA_DIR = Path("Motec_Data/CSV Export")
+FOLDER = Path('dyno_stuff')
+
+DATE = Path(FOLDER /"20 March")
+
+DYNO_DATA_DIR = Path(DATE / "Dyno_Data")
+MOTEC_DATA_DIR = Path(DATE / "Motec_Data/CSV Export")
 
 # Final-drive ratio used to convert axle <-> motor quantities.
 GEAR_RATIO = 43 / 11
@@ -63,6 +69,38 @@ MOTEC_CURRENT = "Car.Data.Inverter.InverterDCCurrent"
 # Column names we derive on the dyno frame.
 DYNO_RPM = "Calculated Motor RPM"
 DYNO_TORQUE = "Calculated Motor Torque"
+
+
+
+# --------------------------------------------------------------------------- #
+# Default datasets (edit to match the files you have)
+# --------------------------------------------------------------------------- #
+
+DYNO_MATCHED = [
+    "speedramp2_pl60_manual_dhruv.csv",
+    "speedramp3_pl70_manual_dhruv.csv",
+    "speedramp4_pl80_manual_dhruv.csv",
+    "speedramp5_pl90_manual_dhruv.csv",
+    "speedramp6_pl100_manual_dhruv.csv",
+    "speedramp7_pl110_manual_dhruv.csv",
+    "speedramp8_pl120_manual_dhruv.csv",
+    "speedramp9_pl130_manual_dhruv.csv",
+    "speedramp10_pl140_manual_dhruv.csv",
+]
+
+MOTEC_MATCHED = [
+    "pl60_1.csv",
+    "pl70_1.csv",
+    "pl80_1.csv",
+    "pl90_1.csv",
+    "pl100_1.csv",
+    "pl110_1.csv",
+    "pl120_1.csv",
+    "pl130_1.csv",
+]
+
+
+
 
 
 # --------------------------------------------------------------------------- #
@@ -523,34 +561,6 @@ def plot_interactive_efficiency_surface(combined_df, grid_num=100, show=True, sa
 
 
 # --------------------------------------------------------------------------- #
-# Default datasets (edit to match the files you have)
-# --------------------------------------------------------------------------- #
-
-DYNO_MATCHED_PERF = [
-    "speedramp2_pl60_manual_dhruv.csv",
-    "speedramp3_pl70_manual_dhruv.csv",
-    "speedramp4_pl80_manual_dhruv.csv",
-    "speedramp5_pl90_manual_dhruv.csv",
-    "speedramp6_pl100_manual_dhruv.csv",
-    "speedramp7_pl110_manual_dhruv.csv",
-    "speedramp8_pl120_manual_dhruv.csv",
-    "speedramp9_pl130_manual_dhruv.csv",
-    "speedramp10_pl140_manual_dhruv.csv",
-]
-
-MOTEC_MATCHED_PERF = [
-    "pl60_1.csv",
-    "pl70_1.csv",
-    "pl80_1.csv",
-    "pl90_1.csv",
-    "pl100_1.csv",
-    "pl110_1.csv",
-    "pl120_1.csv",
-    "pl130_1.csv",
-]
-
-
-# --------------------------------------------------------------------------- #
 # Entry point
 # --------------------------------------------------------------------------- #
 
@@ -580,11 +590,11 @@ def main():
     DYNO_DATA_DIR = args.dyno_dir
     MOTEC_DATA_DIR = args.motec_dir
 
-    offset = [1] * len(DYNO_MATCHED_PERF)
+    offset = [1] * len(DYNO_MATCHED)
 
     combined_df = process_and_compute_efficiency(
-        DYNO_MATCHED_PERF,
-        MOTEC_MATCHED_PERF,
+        DYNO_MATCHED,
+        MOTEC_MATCHED,
         offset,
         rpm_diff_tol=args.rpm_tol,
         rolling_window=args.rolling_window,
